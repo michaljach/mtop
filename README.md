@@ -1,6 +1,10 @@
 # mtop
 
-A compact terminal dashboard for a home server. It shows system load, throughput, GPU and Docker on one screen, refreshing every couple of seconds.
+[![Release](https://img.shields.io/github/v/release/michaljach/mtop)](https://github.com/michaljach/mtop/releases/latest)
+[![Homebrew](https://img.shields.io/badge/homebrew-michaljach%2Ftap-orange)](https://github.com/michaljach/homebrew-tap)
+[![Go](https://img.shields.io/github/go-mod/go-version/michaljach/mtop)](go.mod)
+
+**mtop** is a fast terminal system monitor (TUI) for homelab servers and Macs. One screen shows CPU, RAM, swap, disks, network and disk throughput, NVIDIA or Apple Silicon GPU, and Docker containers, refreshing every couple of seconds. Think `htop` or `btop` trimmed down to what matters on a home server, with GPU and Docker built in.
 
 ![mtop screenshot](docs/screenshot.png)
 
@@ -16,6 +20,12 @@ A compact terminal dashboard for a home server. It shows system load, throughput
 Sections whose data isn't available (no GPU, no Docker) are hidden. Bars are green below 75%, yellow from 75% and red from 90%. Per-process and per-container bars are blue.
 
 ## Install
+
+### Homebrew (macOS and Linux)
+
+```sh
+brew install michaljach/tap/mtop
+```
 
 ### Prebuilt binaries
 
