@@ -93,7 +93,7 @@ var (
 )
 
 // collectAppleGPU reads Apple Silicon GPU stats from the IOAccelerator
-// registry entry, which needs no root. Temperature, power and fan are not exposed there.
+// registry entry, which needs no root; temperature comes from the SMC. Power and fan are not exposed.
 func collectAppleGPU() *GPUStat {
 	out, err := runCmd("ioreg", "-r", "-d", "1", "-w", "0", "-c", "IOAccelerator")
 	if err != nil {
@@ -104,6 +104,9 @@ func collectAppleGPU() *GPUStat {
 		return nil
 	}
 	g := &GPUStat{Util: num(util[1]), Temp: -1, Power: -1, Fan: -1, Unified: true}
+	if _, t := smcTemps(); t > 0 {
+		g.Temp = t
+	}
 	if m := reIoregModel.FindStringSubmatch(out); m != nil {
 		g.Name = strings.TrimPrefix(m[1], "Apple ")
 	}

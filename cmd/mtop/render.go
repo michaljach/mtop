@@ -89,19 +89,50 @@ func ratio(used, total float64) float64 {
 	return used / total * 100
 }
 
-func mb(bytes uint64) uint64 { return bytes >> 20 }
-func gb(bytes uint64) uint64 { return bytes >> 30 }
+const (
+	kib = 1 << 10
+	mib = 1 << 20
+	gib = 1 << 30
+	tib = 1 << 40
+)
+
+// unitFor picks the display unit and decimals for a byte count:
+// MB below 1 GB, GB with one decimal below 100 GB, whole GB below 1 TB, then TB.
+func unitFor(b float64) (div float64, unit string, prec int) {
+	switch {
+	case b < gib:
+		return mib, "MB", 0
+	case b < 100*gib:
+		return gib, "GB", 1
+	case b < tib:
+		return gib, "GB", 0
+	default:
+		return tib, "TB", 1
+	}
+}
+
+// sizeStr formats a byte count, e.g. "425 MB", "11.5 GB".
+func sizeStr(b float64) string {
+	div, unit, prec := unitFor(b)
+	return fmt.Sprintf("%.*f %s", prec, b/div, unit)
+}
+
+// usageStr formats used/total in the total's unit, e.g. "9.3 / 15.6 GB".
+func usageStr(used, total float64) string {
+	div, unit, prec := unitFor(total)
+	return fmt.Sprintf("%.*f / %.*f %s", prec, used/div, prec, total/div, unit)
+}
 
 func rateStr(bps float64) string {
 	switch {
-	case bps < 1024:
+	case bps < kib:
 		return fmt.Sprintf("%.0f B/s", bps)
-	case bps < 1<<20:
-		return fmt.Sprintf("%.0f KB/s", bps/1024)
-	case bps < 1<<30:
-		return fmt.Sprintf("%.1f MB/s", bps/(1<<20))
+	case bps < mib:
+		return fmt.Sprintf("%.0f KB/s", bps/kib)
+	case bps < gib:
+		return fmt.Sprintf("%.1f MB/s", bps/mib)
 	default:
-		return fmt.Sprintf("%.1f GB/s", bps/(1<<30))
+		return fmt.Sprintf("%.1f GB/s", bps/gib)
 	}
 }
 
@@ -181,14 +212,14 @@ func renderSystem(line func(string), v view) {
 	line(gauge("cpu", lw, s.CPU, level(s.CPU), temp))
 
 	ram := ratio(float64(s.RAMUsed), float64(s.RAMTotal))
-	line(gauge("ram", lw, ram, level(ram), fmt.Sprintf("%d/%d MB", mb(s.RAMUsed), mb(s.RAMTotal))))
+	line(gauge("ram", lw, ram, level(ram), usageStr(float64(s.RAMUsed), float64(s.RAMTotal))))
 
 	if s.SwapTotal > 0 {
 		swap := ratio(float64(s.SwapUsed), float64(s.SwapTotal))
-		line(gauge("swap", lw, swap, level(swap), fmt.Sprintf("%d/%d MB", mb(s.SwapUsed), mb(s.SwapTotal))))
+		line(gauge("swap", lw, swap, level(swap), usageStr(float64(s.SwapUsed), float64(s.SwapTotal))))
 	}
 	for _, d := range s.Disks {
-		line(gauge(d.Name, lw, d.Percent, level(d.Percent), fmt.Sprintf("%dG/%dG", gb(d.Used), gb(d.Total))))
+		line(gauge(d.Name, lw, d.Percent, level(d.Percent), usageStr(float64(d.Used), float64(d.Total))))
 	}
 }
 
@@ -222,7 +253,7 @@ func renderGPU(line func(string), v view) {
 	if g.Unified {
 		memLabel = "mem"
 	}
-	line(gauge(memLabel, lw, vram, level(vram), fmt.Sprintf("%.0f/%.0f MB", g.MemUsed, g.MemTotal)))
+	line(gauge(memLabel, lw, vram, level(vram), usageStr(g.MemUsed*mib, g.MemTotal*mib)))
 
 	if g.Power >= 0 && g.PowerLimit > 0 {
 		pw := ratio(g.Power, g.PowerLimit)
@@ -237,7 +268,7 @@ func renderGPU(line func(string), v view) {
 		plw = max(plw, len(truncate(p.Name, 20))+2)
 	}
 	for _, p := range g.Procs {
-		line(gauge(truncate(p.Name, 20), plw, ratio(p.Mem, g.MemTotal), blue, fmt.Sprintf("%.0f MB", p.Mem)))
+		line(gauge(truncate(p.Name, 20), plw, ratio(p.Mem, g.MemTotal), blue, sizeStr(p.Mem*mib)))
 	}
 }
 
@@ -272,7 +303,7 @@ func renderDocker(line func(string), v view) {
 	for _, c := range d.Containers {
 		line(styleText.Render(pad(truncate(c.Name, 20), lw)) + bar(c.MemPerc, blue, barWidth) + "  " +
 			styleText.Render(rpad(pctStr(c.MemPerc), 5)) + "   " +
-			styleText.Render(rpad(fmt.Sprintf("%d MB", mb(c.Mem)), 8)) + "   " +
+			styleText.Render(rpad(sizeStr(float64(c.Mem)), 8)) + "   " +
 			styleDim.Render("cpu "+pctStr(c.CPU)))
 	}
 }

@@ -5,8 +5,6 @@ import "time"
 // demoView reproduces the reference screenshot, for checking the layout on
 // machines without an NVIDIA GPU or docker.
 func demoView() view {
-	const mib = 1 << 20
-	const gib = 1 << 30
 	return view{
 		status: "demo",
 		sys: &SystemSnapshot{

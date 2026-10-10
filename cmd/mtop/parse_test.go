@@ -76,3 +76,21 @@ func stripANSI(s string) string {
 	}
 	return string(out)
 }
+
+func TestSizeFormat(t *testing.T) {
+	cases := map[string]string{
+		sizeStr(10 * mib):              "10 MB",
+		sizeStr(11795 * mib):           "11.5 GB",
+		sizeStr(341 * gib):             "341 GB",
+		sizeStr(2 * tib):               "2.0 TB",
+		usageStr(9552*mib, 15923*mib):  "9.3 / 15.5 GB",
+		usageStr(341*gib, 441*gib):     "341 / 441 GB",
+		usageStr(250*mib, 1024*mib):    "0.2 / 1.0 GB",
+		usageStr(11703*mib, 12288*mib): "11.4 / 12.0 GB",
+	}
+	for got, want := range cases {
+		if got != want {
+			t.Errorf("got %q, want %q", got, want)
+		}
+	}
+}

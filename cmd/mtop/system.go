@@ -90,6 +90,9 @@ func (c *systemCollector) collect() SystemSnapshot {
 
 // cpuTemp returns the hottest CPU package/die sensor, or 0 if none is found.
 func cpuTemp() float64 {
+	if t, _ := smcTemps(); t > 0 {
+		return t
+	}
 	temps, _ := host.SensorsTemperatures() // partial results come with an error
 	var best float64
 	for _, t := range temps {
