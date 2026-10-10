@@ -3,6 +3,7 @@
 [![Release](https://img.shields.io/github/v/release/michaljach/mtop)](https://github.com/michaljach/mtop/releases/latest)
 [![Homebrew](https://img.shields.io/badge/homebrew-michaljach%2Ftap-orange)](https://github.com/michaljach/homebrew-tap)
 [![Go](https://img.shields.io/github/go-mod/go-version/michaljach/mtop)](go.mod)
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
 **mtop** is a fast terminal system monitor (TUI) for homelab servers and Macs. One screen shows CPU, RAM, swap, disks, network and disk throughput, NVIDIA or Apple Silicon GPU, and Docker containers, refreshing every couple of seconds. Think `htop` or `btop` trimmed down to what matters on a home server, with GPU and Docker built in.
 
@@ -69,3 +70,7 @@ mtop -version
 - **Linux or macOS.** On macOS the temperature readings need a build with cgo, which is the default when building on a Mac and is how the release binaries are built.
 - **`nvidia-smi`** on `PATH` for NVIDIA GPU stats.
 - **`docker`** on `PATH`, with your user allowed to talk to the daemon (for example via the `docker` group), for container stats.
+
+## License
+
+[MIT](LICENSE) © Michal Jach
