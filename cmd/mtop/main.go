@@ -10,11 +10,20 @@ import (
 	"github.com/charmbracelet/x/term"
 )
 
+// version is set at release time with -ldflags "-X main.version=...".
+var version = "dev"
+
 func main() {
 	interval := flag.Duration("interval", 2*time.Second, "refresh interval")
 	demo := flag.Bool("demo", false, "render fixed sample data instead of live metrics")
 	once := flag.Bool("once", false, "print a single frame and exit")
+	showVersion := flag.Bool("version", false, "print version and exit")
 	flag.Parse()
+
+	if *showVersion {
+		fmt.Println("mtop", version)
+		return
+	}
 
 	if *once {
 		fmt.Println(render(snapshotOnce(*interval, *demo)))
