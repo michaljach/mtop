@@ -8,12 +8,12 @@ import (
 
 func TestParseSize(t *testing.T) {
 	cases := map[string]uint64{
-		"1.5GiB":   3 << 29,
-		"425MiB":   425 << 20,
-		"512KiB":   512 << 10,
-		"1.5kB":    1500,
-		"0B":       0,
-		"garbage":  0,
+		"1.5GiB":  3 << 29,
+		"425MiB":  425 << 20,
+		"512KiB":  512 << 10,
+		"1.5kB":   1500,
+		"0B":      0,
+		"garbage": 0,
 	}
 	for in, want := range cases {
 		if got := parseSize(in); got != want {

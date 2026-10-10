@@ -218,7 +218,11 @@ func renderGPU(line func(string), v view) {
 	line(gauge("util", lw, g.Util, level(g.Util), temp))
 
 	vram := ratio(g.MemUsed, g.MemTotal)
-	line(gauge("vram", lw, vram, level(vram), fmt.Sprintf("%.0f/%.0f MB", g.MemUsed, g.MemTotal)))
+	memLabel := "vram"
+	if g.Unified {
+		memLabel = "mem"
+	}
+	line(gauge(memLabel, lw, vram, level(vram), fmt.Sprintf("%.0f/%.0f MB", g.MemUsed, g.MemTotal)))
 
 	if g.Power >= 0 && g.PowerLimit > 0 {
 		pw := ratio(g.Power, g.PowerLimit)

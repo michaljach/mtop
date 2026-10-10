@@ -15,7 +15,7 @@ ram    █████████████▏            59%   9552/15923 MB
 
 - **System**: CPU usage and temperature, RAM, swap, and usage for each mounted disk
 - **Throughput**: LAN and VPN (tun/wg/tailscale/utun…) rates, plus read/write rates per disk
-- **GPU**: utilisation, VRAM, power, fan and per-process VRAM. Uses `nvidia-smi` and is hidden when it isn't available.
+- **GPU**: utilisation, VRAM, power, fan and per-process VRAM via `nvidia-smi`. On Apple Silicon it shows utilisation and GPU memory in use via `ioreg`. Hidden when neither is available.
 - **Docker**: running counts per compose project, health checks, and memory/CPU per container. Uses the `docker` CLI and is hidden when it isn't installed.
 
 Bars are green below 75%, yellow from 75% and red from 90%. Per-process and per-container bars are blue.
